@@ -6,3 +6,5 @@ This project explores how socioeconomic factors change from 2012 to 2023 in Cali
 - Demographic changes: Has racial composition changed over time?
 - Patterns consistent with gentrification: Do we see a change from lower educated and lower income population to the opposite?
 
+
+

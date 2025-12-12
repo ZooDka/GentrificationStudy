@@ -8,11 +8,10 @@ execute:
   message: false
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "Gentrification Study"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Zoga Duka zd2377
+  repo-url: https://zoodka.github.io/GentrificationStudy/
   date: today
   page-footer:
     right: |
