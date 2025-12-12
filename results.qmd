@@ -1,1 +1,727 @@
 # Results
+
+```{r}
+library(tidycensus)
+library(purrr)
+library(stringr)
+library(janitor)
+library(tidyr)
+library(ggplot2)
+library(fixest)
+library(tibble)
+library(dplyr)
+library(ggridges)
+library(scales)
+library(fixest)     # panel FE regressions
+library(ineq)       # Gini, Lorenz
+library(ranger)     # random forest
+library(vip)        
+library(tidyverse)
+library(sf)
+library(tigris)
+library(ineq)
+library(patchwork)
+library(viridis)
+library(ggrepel)
+
+source("/Users/zogaduka/Documents/GraduateSchool/semester1/EDA/FinalProject/GentrificationAnalysis/dataIngestion.R")
+
+
+
+```
+
+
+
+First I would like to know how education has shifted among the population.
+
+```{r}
+
+
+
+acs_clean |>
+  filter(state == "NY") |>
+  mutate(year = factor(year, levels = sort(unique(year)))) |>
+  ggplot(aes(x = college_share, y = year, fill = after_stat(x))) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    scale = 2.2,
+    rel_min_height = 0.01,
+    size = 0.35,
+    color = "black"
+  ) +
+  scale_fill_viridis_c(option = "C") +
+  scale_x_continuous(
+    limits = c(0, 1),
+    breaks = seq(0, 1, 0.1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_y_discrete(expand = expansion(mult = c(0.02, 0.07))) +
+  labs(
+    title = "Ridgeline of Educational Attainment (College Share) by Year, NY",
+    x = "College Share (Percent with Bachelor's+)",
+    y = "Year"
+  ) +
+  theme_ridges(font_size = 13) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    axis.title.x = element_text(hjust = 0.5, margin = margin(t = 10)),
+    axis.title.y = element_text(hjust = 0.5, margin = margin(r = 10)),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+
+
+```
+```{r}
+
+acs_clean |>
+  filter(state == "NJ") |>
+  mutate(year = factor(year, levels = sort(unique(year)))) |>
+  ggplot(aes(x = college_share, y = year, fill = after_stat(x))) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    scale = 2.2,
+    rel_min_height = 0.01,
+    size = 0.35,
+    color = "black"
+  ) +
+  scale_fill_viridis_c(option = "C") +
+  scale_x_continuous(
+    limits = c(0, 1),
+    breaks = seq(0, 1, 0.1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_y_discrete(expand = expansion(mult = c(0.02, 0.07))) +
+  labs(
+    title = "Ridgeline of Educational Attainment (College Share) by Year, NJ",
+    x = "College Share (Percent with Bachelor's+)",
+    y = "Year"
+  ) +
+  theme_ridges(font_size = 13) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    axis.title.x = element_text(hjust = 0.5, margin = margin(t = 10)),
+    axis.title.y = element_text(hjust = 0.5, margin = margin(r = 10)),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+```
+```{r}
+
+acs_clean |>
+  filter(state == "CA") |>
+  mutate(year = factor(year, levels = sort(unique(year)))) |>
+  ggplot(aes(x = college_share, y = year, fill = after_stat(x))) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    scale = 2.2,
+    rel_min_height = 0.01,
+    size = 0.35,
+    color = "black"
+  ) +
+  scale_fill_viridis_c(option = "C") +
+  scale_x_continuous(
+    limits = c(0, 1),
+    breaks = seq(0, 1, 0.1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_y_discrete(expand = expansion(mult = c(0.02, 0.07))) +
+  labs(
+    title = "Ridgeline of Educational Attainment (College Share) by Year, CA",
+    x = "College Share (Percent with Bachelor's+)",
+    y = "Year"
+  ) +
+  theme_ridges(font_size = 13) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    axis.title.x = element_text(hjust = 0.5, margin = margin(t = 10)),
+    axis.title.y = element_text(hjust = 0.5, margin = margin(r = 10)),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+```
+
+
+
+
+
+```{r}
+
+acs_long_complete |>
+  filter(
+    state %in% c("CA", "NJ", "NY"),
+    year %in% c(2012, 2023),
+    !is.na(college_share)
+  ) |>
+  mutate(
+    year = factor(year),
+    state = factor(state, levels = c("CA","NJ","NY"))
+  ) |>
+  ggplot(aes(x = college_share, fill = year)) +
+  geom_density(alpha = 0.25, linewidth = 0.4, color = "black") +
+  facet_wrap(~ state, ncol = 1, scales = "fixed") +
+  scale_fill_viridis_d(option = "plasma") +
+  scale_x_continuous(
+    limits = c(0, 1),
+    breaks = seq(0, 1, 0.1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  labs(
+    title = "College Share Distribution: 2012 vs 2023",
+    x = "College Share (Percent with Bachelor's+)",
+    y = "Density",
+    fill = "Year"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.title.x = element_text(hjust = 0.5, margin = margin(t = 10)),
+    axis.title.y = element_text(hjust = 0.5, margin = margin(r = 10)),
+    strip.text = element_text(size = 16, face = "bold"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank()
+  )
+
+```
+We can clearly see more college educated residents. By 2023, the distribution shifts right which means the education is more spread our across the population. This could indicate gentrification as more educated (assumingly higher earners) move to these areas. A larger share of the population has college degrees in 2023 than in 2012. This could be the people already living there getting educated or the people there in 2012 were forced out due to gentrification, leading to high income earners with degrees moving in. Now let's graph education and income to explore my hypothesis. 
+
+
+```{r}
+acs_long_complete |>
+  filter(
+    (state == "CA" | state == "NJ" | state == "NY"),
+    (year == 2012 | year == 2023),
+    !is.na(real_income)
+  ) |>
+  ggplot(aes(
+    x = real_income,
+    fill = factor(year)
+  )) +
+  geom_density(alpha = 0.25, linewidth = 0.4, adjust = 1) +
+  facet_wrap(~ state, ncol = 1, scales = "fixed") +
+  scale_x_continuous(
+    labels = scales::dollar_format(),
+    breaks = seq(0, 250000, 50000),
+    limits = c(0, 250000)
+  ) +
+  scale_y_continuous(
+    labels = scales::number_format(accuracy = 0.000001),
+    expand = expansion(mult = c(0, .05))
+  ) +
+  scale_fill_viridis_d(option = "plasma") +
+  labs(
+    title = "Income Distribution: 2012 vs 2023",
+    x = "Income",
+    y = "Density",
+    fill = "Year"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.title.x = element_text(hjust = 0.5),
+    axis.title.y = element_text(hjust = 0.5)
+  )
+
+
+```
+
+
+-California has the largest right shift and expansion in income to the general population. This is a very long right tail into $250k+.
+-New Jersey has a less extreme tail but it's still showing a wide gap between low and high-income people.
+-New York is very similar to CA and stretches to the high end salaries. This could indicate significant income growth.
+
+
+This makes me ask if fthe population has shifted so we will analyze that next. 
+```{r}
+acs_long_complete |>
+  filter(
+    (state == "CA" | state == "NJ" | state == "NY")
+  ) |>
+  mutate(total_population = as.numeric(total_population)) |>
+  group_by(state, year) |>
+  summarise(pop = sum(total_population, na.rm = TRUE), .groups = "drop") |>
+  ggplot(aes(x = year, y = pop, color = state)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  scale_x_continuous(
+    breaks = sort(unique(acs_long_complete$year))
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  scale_color_viridis_d(option = "plasma") +
+  labs(
+    title = "Population Change Over Time",
+    x = "Year",
+    y = "Population",
+    color = "State"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    plot.title = element_text(hjust = 0.5)
+  )
+
+
+
+```
+Population doesn't seem to have changed much so this shouldn't affect our analysis moving forward. 
+
+
+This leads me to ask if education and income has changed over time in their relationship. 
+```{r}
+
+clean_df <- acs_long_complete |>
+  filter(
+    is.finite(college_share),
+    is.finite(real_income)
+  )
+
+ggplot(clean_df,
+       aes(x = college_share, y = real_income, color = factor(year))) +
+  geom_smooth(se = FALSE, size = 1.2, span = 0.8) +
+  scale_x_continuous(
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  scale_color_viridis_d(option = "plasma") +
+  labs(
+    title = "Education–Income Relationship Over Time",
+    subtitle = "Smoothed trend lines by year",
+    x = "% College Educated",
+    y = "Income",
+    color = "Year"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+```
+We can see that as % college educated increases, income increases. Meaning education is one of the strongest predictors of income. At the same education level are richer in 2023 than in 2012. This could indicate higher income earners and high education people are moving to these areas (gentrification). There is a strong, positive education income relationship, and it becomes steeper over time.
+Recently incomes rise faster as education increases.
+My overall impression is that income is rising but becoming more unequal while education is also rising and they seem to be correlated. 
+Let's do some map analysis on NY specifically so we can check if we can notice any other patterns visually. 
+
+```{r}
+plot_variable_change("NY", acs_clean, "median_income", title_label = "Income")
+plot_variable_change("NY", acs_clean, "median_gross_rent", title_label = "Rent")
+plot_variable_change("NY", acs_clean, "poverty_rate", title_label = "Poverty Rate")
+plot_variable_change("NY", acs_clean, "college_share", title_label = "College Share")
+```
+
+```{r}
+plot_gentrification("NY", acs_clean, "median_income")
+plot_gentrification("NY", acs_clean, "median_gross_rent")
+```
+For NY we can conclude that statewide median income rises from 2012 to 2023. With the brightest and highest income areas intensifying. Although rent increases are more agressive than income growth which could push the locals out of their home state/county. Poverty rate has a slight decrease which could be a sign of higher income earners moving in and people who are struggling being pushed out. Then in the gentrification map we notice the places with steep rent increases, declining poverty and increasing education levels are getting more gentrification results. 
+
+Let's do some analysis on NJ specifically 
+
+```{r}
+plot_variable_change("NJ", acs_clean, "median_income", title_label = "Income")
+plot_variable_change("NJ", acs_clean, "median_gross_rent", title_label = "Rent")
+plot_variable_change("NJ", acs_clean, "poverty_rate", title_label = "Poverty Rate")
+plot_variable_change("NJ", acs_clean, "college_share", title_label = "College Share")
+
+```
+
+
+```{r}
+plot_gentrification("NJ", acs_clean, "median_income")
+plot_gentrification("NJ", acs_clean, "median_gross_rent")
+```
+For NJ we see that NJ suburbs near NYC have income growth. Rent growth tracks closely with areas that also saw increases in education and also proximity to NYC. Gentrification pattern is consistent with these results as well. 
+
+Let's do some analysis on CA specifically 
+
+```{r}
+plot_variable_change("CA", acs_clean, "median_income", title_label = "Income")
+plot_variable_change("CA", acs_clean, "median_gross_rent", title_label = "Rent")
+plot_variable_change("CA", acs_clean, "poverty_rate", title_label = "Poverty Rate")
+plot_variable_change("CA", acs_clean, "college_share", title_label = "College Share")
+
+```
+
+
+```{r}
+plot_gentrification("CA", acs_clean, "median_income")
+plot_gentrification("CA", acs_clean, "median_gross_rent")
+```
+
+
+
+
+We see a consistent rise in income around metro areas and areas previously already high in income, which could lead to more segregation. Rent increases at a much much higher rate than income which could also cause displacement, there is a decrease in poverty as well which could mean high income earners moving in. These high income earners must have degrees as well since education increases accross the state. 
+
+
+
+
+
+
+Let's double check our work with some more analysis. 
+
+
+```{r}
+
+income_trend <- acs_clean |>
+  group_by(state, year) |>
+  summarise(income = weighted.mean(median_income, total_population))
+
+ggplot(income_trend, aes(year, income, color = state)) +
+  geom_line(size = 1.3) +
+  geom_point(size = 3) +
+  scale_y_continuous(labels = dollar) +
+  scale_color_viridis_d() +
+  labs(title = "Median Income Trends (2011–2023)", y = "Median Income")
+
+
+```
+```{r}
+rent_trend <- acs_clean |>
+  group_by(state, year) |>
+  summarise(rent = weighted.mean(median_gross_rent, total_population))
+
+ggplot(rent_trend, aes(year, rent, color = state)) +
+  geom_line(size = 1.3) +
+  geom_point(size = 3) +
+  scale_y_continuous(labels = dollar) +
+  scale_color_viridis_d() +
+  labs(title = "Median Rent Trends (2011–2023)", y = "Gross Rent")
+
+```
+
+
+
+```{r}
+college_trend <- acs_clean |>
+  group_by(state, year) |>
+  summarise(college = weighted.mean(college_share, total_population))
+
+ggplot(college_trend, aes(year, college, color = state)) +
+  geom_line(size = 1.3) +
+  geom_point(size = 3) +
+  scale_y_continuous(labels = percent) +
+  scale_color_viridis_d() +
+  labs(title = "College-Educated Share (2011–2023)", y = "College Share")
+```
+
+
+```{r}
+poverty_trend <- acs_clean |>
+  group_by(state, year) |>
+  summarise(poverty = weighted.mean(poverty_rate, total_population))
+
+ggplot(poverty_trend, aes(year, poverty, color = state)) +
+  geom_line(size = 1.3) +
+  geom_point(size = 3) +
+  scale_y_continuous(labels = dollar) +
+  scale_color_viridis_d() +
+  labs(title = "Median Rent Trends (2011–2023)", y = "Gross Rent")
+```
+
+These graphs are consistent with what I just concluded with in the maps prior. Income, rent and education indicators increase while poverty decreases.
+
+
+
+```{r}
+
+
+ggplot(acs_clean, aes(poverty_rate, median_income)) +
+  geom_hex() +
+  scale_fill_viridis_c() +
+  scale_y_continuous(labels = dollar) +
+  labs(
+    title = "Poverty vs Median Income",
+    x = "Poverty Rate (%)",
+    y = "Median Income"
+  ) +
+  theme_minimal(base_size = 15)
+
+
+```
+There is a negative relationship between these two variables as poverty rate increases, median income decreases. Most of the US lies between 50k to 80k salary band. We can also show the same with a 2d density plot.
+
+```{r}
+plot_poverty_income <- function(state_name) {
+  ggplot(
+    acs_clean |> filter(state == state_name),
+    aes(x = poverty_rate, y = median_income)
+  ) +
+    geom_density_2d(color = "black", linewidth = 0.6) +
+    scale_y_continuous(labels = dollar) +
+    labs(
+      title = paste("Poverty vs Median Income –", state_name),
+      x = "Poverty Rate (%)",
+      y = "Median Income"
+    ) +
+    theme_minimal(base_size = 15)
+}
+
+```
+
+```{r}
+plot_poverty_income("NY")
+plot_poverty_income("NJ")
+plot_poverty_income("CA")
+```
+Now lets compare the 2012 2d density plot of povery rate and median income. We see that median incomes are higher in 2023 for areas with similar poverty rates. This is a crucial part, it reflects the actual patterns where we see wage growth, inflation adjustments, and maybe even post pandemic income shifts.
+
+```{r}
+
+
+acs_clean |>
+  filter(year == c(2012, 2023), state == "CA") |>
+  ggplot(aes(poverty_rate, median_income, color = factor(year))) +
+  geom_density_2d() +
+  labs(color = "Year")
+
+```
+
+
+
+
+
+
+
+To answer the question "How have inequality and segregation evolved between 2011 to 2023?" we have to take a holistic approach. First lets look at the income inequality over time. 
+
+
+
+```{r}
+ineq_df <- acs_clean |>
+  filter(!is.na(real_income), real_income > 0) |>
+  group_by(year) |>
+  summarise(
+    gini = ineq::Gini(real_income),
+    theil = ineq::Theil(real_income)
+  )
+
+ggplot(ineq_df, aes(x = year)) +
+  geom_line(aes(y = gini), linewidth = 1.2, color = "blue") +
+  geom_point(aes(y = gini), color = "blue") +
+  labs(title = "Income Inequality (Gini) Over Time",
+       y = "Gini Coefficient", x = "Year") +
+  theme_minimal()
+```
+From 2012 to about 2016 or 2017, the Gini coefficient increases. This could be because of growing income separation between higher and lower earning people and early signals consistent with post recession recovery where high income households gain more. This could indicate new investment in certain neighborhoods, maybe wage growth concentrated among high skill jobs and uneven housing appreciation which could lead to gentrification.
+The Gini values peak around 0.2625.This could mean inequality hit a maximum  and after this the gini begins shifting in the opposite direction. From 2017 and forward, the Gini decreases with a sharp drop after 2020. This could indicate that income distribution became somewhat more equal, lower income households may have received some support or raises in wages which checks out since during the pandemic there were policies to boost the economy (stimulus, unemployment benefits, rental aid) which might have helped close the gap in inequality. Housing markets might have also not had any crazy activity in these low income areas.
+Although a good question to ask here is, did the wages, housing market and overall health of these states get fairer or did the high income earners move away from these areas leaving a more lower average to reach for low income earners. 
+
+
+
+Next, let's take a look at this hypothesis. 
+
+
+```{r}
+library(ggridges)
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+income_clean <- acs_clean |>
+  filter(!is.na(real_income), real_income > 0, real_income < 300000)
+
+income_two_years <- income_clean |>
+  filter(year == c(2012, 2023))
+
+ggplot(income_two_years, aes(x = real_income, y = factor(year), fill = factor(year))) +
+  geom_density_ridges(alpha = 0.6, color = "black", scale = 1.2) +
+  scale_x_continuous(labels = comma) +
+  scale_fill_manual(values = c("2012" = "salmon", "2023" = "lightblue")) +
+  labs(
+    title = "Distribution of Income: 2012 vs 2023",
+    x = "Real Income",
+    y = ""
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "none")
+
+
+
+```
+As we see from above, not only did the high income earners leave making the disctribution more flat, but the overall spread of income seems to be a lot more fair now as well. 
+
+
+
+```{r}
+income_all_years <- income_clean |>
+  filter(year >= 2011, year <= 2023)
+
+ggplot(income_all_years, aes(x = real_income, y = factor(year), fill = year)) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
+  scale_x_continuous(labels = comma) +
+  scale_fill_viridis_c(option = "C") +
+  labs(
+    title = "Income Distribution Across All Years (2011–2023)",
+    x = "Real Income",
+    y = "Year"
+  ) +
+  theme_minimal(base_size = 14)
+
+
+```
+
+
+
+```{r}
+library(patchwork)
+
+p1 <- ggplot(income_two_years, aes(x = real_income, fill = factor(year))) +
+  geom_density(alpha = 0.5) +
+  scale_x_continuous(labels = comma) +
+  scale_fill_manual(values = c("2012" = "salmon", "2023" = "lightblue")) +
+  labs(title = "2012 vs 2023 Income Density", x = "", y = "Density") +
+  theme_minimal()
+
+
+
+
+library(dplyr)
+library(ineq)
+
+
+ineq_seg <- acs_clean |>
+  filter(!is.na(real_income), real_income > 0) |>
+  group_by(year) |>
+  summarise(
+    gini = ineq::Gini(real_income),
+    theil = ineq::Theil(real_income),
+    dissimilarity = 0.5 * sum(abs((black_pop / sum(black_pop, na.rm = TRUE)) -
+                                  (white_pop / sum(white_pop, na.rm = TRUE))),
+                              na.rm = TRUE)
+  ) |>
+  arrange(year)
+
+
+
+
+p2 <- ggplot(ineq_seg, aes(year, gini)) +
+  geom_line(color = "darkblue", linewidth = 1.3) +
+  geom_point(color = "darkblue") +
+  labs(title = "Gini Inequality Over Time", x = "Year", y = "Gini") +
+  theme_minimal()
+
+p1 / p2
+
+```
+From the above graphs we could deduce that households are richer in 2023 than in 2012, but the distribution also stretches more, which could indicate changes in inequality and possible early phase gentrification in some areas. Between 2012 and 2023, incomes increased, but the pattern of growth then shifts, inequality worsened until 2016–2017 as high income households pulled away, then narrowed after 2018 as middle and lower income groups experienced faster gains.
+
+
+```{r}
+seg_state <- acs_clean |>
+  group_by(state, year) |>
+  summarise(
+    D = 0.5 * sum(abs(
+      (black_pop / sum(black_pop, na.rm = TRUE)) -
+      (white_pop / sum(white_pop, na.rm = TRUE))
+    ), na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ggplot(seg_state, aes(year, D, color = state)) +
+  geom_line(size = 1.3) +
+  geom_point(size = 2) +
+  scale_color_viridis_d() +
+  labs(
+    title = "Racial Segregation Over Time (Dissimilarity Index)",
+    x = "Year",
+    y = "Dissimilarity (0–1)"
+  ) +
+  theme_minimal(base_size = 15)
+
+```
+
+
+
+```{r}
+demo <- acs_clean |>
+  group_by(state, year) |>
+  summarise(
+    white  = weighted.mean(white_share, total_population, na.rm = TRUE),
+    black  = weighted.mean(black_share, total_population, na.rm = TRUE),
+    asian  = weighted.mean(asian_share, total_population, na.rm = TRUE),
+    hisp   = weighted.mean(hispanic_share, total_population, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  tidyr::pivot_longer(cols = -c(state, year))
+
+ggplot(demo, aes(year, value, color = name)) +
+  geom_line(linewidth = 1.2) +
+  facet_wrap(~ state) +
+  scale_y_continuous(labels = percent) +
+  scale_color_viridis_d() +
+  labs(
+    title = "Racial Composition Over Time",
+    color = "Group",
+    x = "Year",
+    y = "Share of Population"
+  ) +
+  theme_minimal(base_size = 16)
+
+
+```
+
+
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+
+race_heat <- acs_clean |>
+  group_by(state, year) |>
+  summarise(
+    white = weighted.mean(white_share, total_population, na.rm = TRUE),
+    black = weighted.mean(black_share, total_population, na.rm = TRUE),
+    asian = weighted.mean(asian_share, total_population, na.rm = TRUE),
+    hisp  = weighted.mean(hispanic_share, total_population, na.rm = TRUE)
+  ) |>
+  pivot_longer(-c(state, year))
+
+ggplot(race_heat, aes(year, name, fill = value)) +
+  geom_tile() +
+  scale_fill_viridis_c(labels = scales::percent) +
+  facet_wrap(~ state) +
+  labs(
+    title = "Heatmap of Demographic Composition by Year",
+    x = "Year",
+    y = "Group"
+  ) +
+  theme_minimal(base_size = 16)
+
+
+
+```
+
+```{r}
+ggplot(acs_clean, aes(x = state, y = median_income, fill = state)) +
+  geom_boxplot(outlier.alpha = 0.2) +
+  scale_fill_viridis_d() +
+  labs(
+    title = "Income Distribution by State",
+    y = "Median Income"
+  ) +
+  theme_minimal(base_size = 16)
+
+```
+
+
+
+
+
+
+
+
+
+
+
