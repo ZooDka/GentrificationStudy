@@ -674,34 +674,6 @@ ggplot(demo, aes(year, value, color = name)) +
 
 
 
-```{r}
-library(dplyr)
-library(tidyr)
-
-race_heat <- acs_clean |>
-  group_by(state, year) |>
-  summarise(
-    white = weighted.mean(white_share, total_population, na.rm = TRUE),
-    black = weighted.mean(black_share, total_population, na.rm = TRUE),
-    asian = weighted.mean(asian_share, total_population, na.rm = TRUE),
-    hisp  = weighted.mean(hispanic_share, total_population, na.rm = TRUE)
-  ) |>
-  pivot_longer(-c(state, year))
-
-ggplot(race_heat, aes(year, name, fill = value)) +
-  geom_tile() +
-  scale_fill_viridis_c(labels = scales::percent) +
-  facet_wrap(~ state) +
-  labs(
-    title = "Heatmap of Demographic Composition by Year",
-    x = "Year",
-    y = "Group"
-  ) +
-  theme_minimal(base_size = 16)
-
-
-
-```
 
 ```{r}
 ggplot(acs_clean, aes(x = state, y = median_income, fill = state)) +

@@ -33,5 +33,7 @@ The Decennial Census is collected every 10 years although some parts of the data
 After combining the three datasets we get a final balanced pannel of data with 186,749 observations and 92 total columns.
 
 ## EDA and Missing value analysis
-The data analysis EDA and transformation to massage the data before our analysis is done in the "script.R" file
-
+The data analysis EDA and transformation to massage the data before our analysis is done in the "dataIngestion.R" file
+I drop the columns > 40% missing. 
+I use median imputation for numerics. 
+I use mode imputation for character columns
