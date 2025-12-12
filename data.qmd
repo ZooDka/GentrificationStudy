@@ -1,5 +1,37 @@
-# Data
+# Data and description
 
-## Description
+The dataset I will use to analyze gentrification is the American Community Survey, Decennial Census (for population, housing, etc), and TIGER/Line Shapefiles (for mapping, boundaries). Some of the many variables I will pull are:
 
-## Missing value analysis
+-   B25064 (median gross rent)
+
+-   B25077 (median home value)
+
+-   B19013 (median household income)
+
+-   B03002 (race/ethnicity composition)
+
+-   B17001 (Poverty status)
+
+-   B15003 (Educational status)
+
+-   B23025 (Employment)
+
+The data is collected by the US Census Bureau.
+
+ACS is updated on an annual basis and provides data on social, economic, housing, education, employment and characteristics on the population. The data is corrected year round and is sent to areas with a population of 65,000 or more.
+
+<https://www.census.gov/programs-surveys/acs.html>
+
+TIGER/Line Shapefiles is collected continuously through field work and imagery. Some parts of the dataset is updated annually (general boundaries) and some are updated more frequently.
+
+<https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html>
+
+The Decennial Census is collected every 10 years although some parts of the dataset like housing or education is derived through the ACS and gives the Decennial Census yearly estimates. It contains the basic population counts and some demographic information.
+
+<https://www.census.gov/programs-surveys/decennial-census.html>
+
+After combining the three datasets we get a final balanced pannel of data with 186,749 observations and 92 total columns.
+
+## EDA and Missing value analysis
+The data analysis EDA and transformation to massage the data before our analysis is done in the "script.R" file
+
