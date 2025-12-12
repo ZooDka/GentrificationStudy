@@ -1,15 +1,21 @@
 # Conclusion
 To conclude, across the states of New York, California and New Jersey, there is an indication that education, income, rent and demographic info has changed across time. The patterns shown are patterns simmilar to that of gentrification. There is a tight education/income relationship that could explain some of these issues. 
-#Education
-We have education that increases sharply accross the three states meaning that a higher share of the population is college educated in 2023 compared to 2012. THis could mean that either existing residents are becoming more educated or there are highly educated and high income earnerst that are moving to these areas (this is extremely relevant to gentrification).
 
-#Income
-Income has risen and steched specifically in NY and California. We have a growth in income at any education level and a more compressed income in general. 
 
-#Rent
+-Education
+
+We have education that increases sharply accross the three states meaning that a higher share of the population is college educated in 2023 compared to 2012. This could mean that either existing residents are becoming more educated or there are highly educated and high income earners that are moving to these areas (this is extremely relevant to gentrification).
+
+-Income
+
+Income has risen and stretched specifically in NY and California. We have a growth in income at any education level and a more compressed income in general. 
+
+-Rent
+
 Acorss the states rent increases much faster than income. These areas with high rent growth are showing a rise in education levels and a dip in poverty levels, meaning people are being pushed out of their state. This could mean cost related displacement since there's pressure to pay higher rents. 
 
-#Poverty
+-Poverty
+
 There is a dip in poverty as well, this could mean that there is a percentage in the population that can no longer afford to live in their own state and is being displaced and replaced with higher income, highly educated people. 
 
 
