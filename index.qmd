@@ -1,1 +1,8 @@
 # Introduction
+This project explores how socioeconomic factors change from 2012 to 2023 in California, New Jersey and New York and is there any pattern consistent with gentrification that is observed. I will study:
+
+- Education changes: Is there a shift in patterns when it comes to the number of people with a bachelors degree in the population?
+- Income changes: How has the household income evolved through the years?
+- Demographic changes: Has racial composition changed over time?
+- Patterns consistent with gentrification: Do we see a change from lower educated and lower income population to the opposite?
+
